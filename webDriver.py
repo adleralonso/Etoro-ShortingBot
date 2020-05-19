@@ -34,33 +34,61 @@ def logIn(driver):
     time.sleep(5)
 
 
-def goToStats(driver):
+def goToStats(driver, companyName):
     # Goes to Interested Stock Stats
-    driver.get('https://www.etoro.com/markets/tsla/stats')
+    companyStatsURL = 'https://www.etoro.com/markets/' + \
+        str(companyName) + '/stats'
+    driver.get(companyStatsURL)
 
 
-def returnValue(driver):
+def returnValue(driver, companyName):
 
-    tslCurrentValue = driver.find_element_by_css_selector(
+    companyCurrentValue = driver.find_element_by_css_selector(
         'span.head-info-stats-value')
 
-    print("Tesla Current Value: " + str(tslCurrentValue.text))
+    print(companyName + "'s Current Value: " + str(companyCurrentValue.text))
 
 
-def returnPercentage(driver):
+def returnPercentage(driver, companyName):
     # Gets todays percentage and value difference from openning
-    tslTodayPercentage = driver.find_element_by_css_selector(
+    companyTodayPercentage = driver.find_element_by_css_selector(
         'span.head-info-stats-change')
 
     # Separates WebElement by Quantity & Percentage
-    tdyPtgChunks = tslTodayPercentage.text.split(' ')
+    tdyPtgChunks = companyTodayPercentage.text.split(' ')
 
     # Prints separated values ready to use for further learning functions
-    print("Tesla's Today Price Difference: " + str(tdyPtgChunks[0]))
-    print("Tesla's Today Percentage Difference: " + str(tdyPtgChunks[1]))
+    print(companyName + "'s Today Price Difference: " + str(tdyPtgChunks[0]))
+    print(companyName + "'s Today Percentage Difference: " +
+          str(tdyPtgChunks[1]))
+
+
+def returnGeneralView(driver, companyName):
+    companyGeneralView = driver.find_element_by_css_selector('div.col')
+
+    print(companyName + "'s General View: \n" + str(companyGeneralView.text))
+
+
+def basicRoutine(driver, companyName, repetitions):
+    # Initialize Driver and Company Name for current Routine
+    driver = driver
+    companyName = companyName
+
+    goToStats(driver, companyName)
+
+    # Repeats the getting stats values operations
+    for x in range(repetitions):
+        time.sleep(3)
+        print("Iteration: " + str(x))
+        returnValue(driver, companyName)
+        returnPercentage(driver, companyName)
+        returnGeneralView(driver, companyName)
+        print("-----------------------------")
+        time.sleep(2)
 
 
 driver = initializeChromWebDriver()
-goToStats(driver)
-returnValue(driver)
-returnPercentage(driver)
+
+basicRoutine(driver, "tsla", 1)
+
+basicRoutine(driver, "btc", 10)
