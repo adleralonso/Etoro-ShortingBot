@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
+import csv
 
 
 def initializeChromWebDriver():
@@ -47,6 +48,7 @@ def returnValue(driver, companyName):
         'span.head-info-stats-value')
 
     print(companyName + "'s Current Value: " + str(companyCurrentValue.text))
+    return str(companyCurrentValue.text)
 
 
 def returnPercentage(driver, companyName):
@@ -62,11 +64,26 @@ def returnPercentage(driver, companyName):
     print(companyName + "'s Today Percentage Difference: " +
           str(tdyPtgChunks[1]))
 
+    return tdyPtgChunks
+
 
 def returnGeneralView(driver, companyName):
-    companyGeneralView = driver.find_element_by_css_selector('div.col')
+    companyGeneralView = driver.find_element_by_css_selector(
+        'et-card-content.market-stats-wrapper')
 
     print(companyName + "'s General View: \n" + str(companyGeneralView.text))
+    return str(companyGeneralView.text)
+
+
+def createCSV():
+    with open('firsthourtsl.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Value", "Range", "Percentage", "Stats"])
+        return writer
+
+
+def addCSVROW(writer, row):
+    writer.writerow(row)
 
 
 def basicRoutine(driver, companyName, repetitions):
@@ -76,19 +93,29 @@ def basicRoutine(driver, companyName, repetitions):
 
     goToStats(driver, companyName)
 
-    # Repeats the getting stats values operations
-    for x in range(repetitions):
-        time.sleep(3)
-        print("Iteration: " + str(x))
-        returnValue(driver, companyName)
-        returnPercentage(driver, companyName)
-        returnGeneralView(driver, companyName)
-        print("-----------------------------")
-        time.sleep(2)
+    with open('firsthourtsl.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Value", "Range", "Percentage", "Stats"])
+
+        # Repeats the getting stats values operations
+        for x in range(repetitions):
+            time.sleep(3)
+            print("Iteration: " + str(x))
+            tempRow = []
+            tempRow.append(returnValue(driver, companyName))
+
+            parcialRow = returnPercentage(driver, companyName)
+            tempRow.append(parcialRow[0])
+            tempRow.append(parcialRow[1])
+            tempRow.append(returnGeneralView(driver, companyName))
+            writer.writerow(tempRow)
+
+            print("-----------------------------")
+            time.sleep(2)
 
 
 driver = initializeChromWebDriver()
 
-basicRoutine(driver, "tsla", 1)
+basicRoutine(driver, "tsla", 10000)
 
-basicRoutine(driver, "btc", 10)
+# basicRoutine(driver, "btc", 10000)
