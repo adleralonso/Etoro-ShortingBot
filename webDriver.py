@@ -25,7 +25,7 @@ def logIn(driver):
     # Finds password box
     pass_box = driver.find_element_by_name('password')
     # Sends password
-    pass_box.send_keys('$$$$')
+    pass_box.send_keys('$$$$$')
 
     time.sleep(5)
     # Finds login button
@@ -37,9 +37,20 @@ def logIn(driver):
 
 def goToStats(driver, companyName):
     # Goes to Interested Stock Stats
-    companyStatsURL = 'https://www.etoro.com/markets/' + \
+    companyStatsURL = 'https://www.etoro.com/v' + \
         str(companyName) + '/stats'
     driver.get(companyStatsURL)
+
+
+def invest(driver):
+    time.sleep(5)
+    # Finds login button
+    login_button = driver.find_element_by_css_selector(
+        'span.ng-binding')
+    time.sleep(5)
+    # Click login
+    login_button.click()
+    print("Invest Button Clicked")
 
 
 def returnValue(driver, companyName):
@@ -75,17 +86,6 @@ def returnGeneralView(driver, companyName):
     return str(companyGeneralView.text)
 
 
-def createCSV():
-    with open('firsthourtsl.csv', 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Value", "Range", "Percentage", "Stats"])
-        return writer
-
-
-def addCSVROW(writer, row):
-    writer.writerow(row)
-
-
 def basicRoutine(driver, companyName, repetitions):
     # Initialize Driver and Company Name for current Routine
     driver = driver
@@ -99,7 +99,7 @@ def basicRoutine(driver, companyName, repetitions):
 
         # Repeats the getting stats values operations
         for x in range(repetitions):
-            time.sleep(3)
+            time.sleep(5)
             print("Iteration: " + str(x))
             tempRow = []
             tempRow.append(returnValue(driver, companyName))
@@ -111,11 +111,14 @@ def basicRoutine(driver, companyName, repetitions):
             writer.writerow(tempRow)
 
             print("-----------------------------")
-            time.sleep(2)
 
 
 driver = initializeChromWebDriver()
-
-basicRoutine(driver, "tsla", 10000)
+driver.get('https://www.etoro.com/login')
+time.sleep(60)
+driver.get('https://www.etoro.com/markets/tsla/stats')
+time.sleep(10)
+invest(driver)
+#basicRoutine(driver, "tsla", 10000)
 
 # basicRoutine(driver, "btc", 10000)
