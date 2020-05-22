@@ -37,7 +37,7 @@ def logIn(driver):
 
 def goToStats(driver, companyName):
     # Goes to Interested Stock Stats
-    companyStatsURL = 'https://www.etoro.com/v' + \
+    companyStatsURL = 'https://www.etoro.com/markets/' + \
         str(companyName) + '/stats'
     driver.get(companyStatsURL)
 
@@ -114,11 +114,11 @@ def basicRoutine(driver, companyName, repetitions):
 
 
 driver = initializeChromWebDriver()
-driver.get('https://www.etoro.com/login')
-time.sleep(60)
-driver.get('https://www.etoro.com/markets/tsla/stats')
-time.sleep(10)
-invest(driver)
-#basicRoutine(driver, "tsla", 10000)
+# driver.get('https://www.etoro.com/login')
+# time.sleep(60)
+# driver.get('https://www.etoro.com/markets/tsla/stats')
+# time.sleep(10)
+# invest(driver)
+basicRoutine(driver, "tsla", 10000)
 
 # basicRoutine(driver, "btc", 10000)
