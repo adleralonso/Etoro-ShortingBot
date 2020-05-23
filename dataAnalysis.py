@@ -109,17 +109,38 @@ def returnGeneralView(driver, companyName):
     return str(companyGeneralView.text)
 
 
+def advice(currentMin, currentMax, currentValue, minDifference):
+ # Sell Buy - Recomendation Based on MinMax difference of 20 or more
+    if float(currentMax) - minDifference > float(currentMin) and float(minDifference*.2) + float(currentMin) >= float(currentValue):
+        advice = "You Should Buy"
+    elif float(currentMax) - minDifference > float(currentMin) and float(minDifference*.8) + (currentMin) <= float(currentValue):
+        advice = "You should Sell"
+    else:
+        advice = "Wait champion"
+
+    # Corrects minDifference Rule on 80/20 based on the difference between currentMax and currentMin
+    if minDifference < currentMax - currentMin:
+        minDifference = currentMax - currentMax
+    print(advice)
+
+    return minDifference, advice
+
+
 def basicRoutine(driver, companyName, repetitions):
     # Initialize Driver and Company Name for current Routine
     driver = driver
     companyName = companyName
     currentMin = 1000000
     currentMax = -1000000
+    currentDifference = 20
+    currentAdvice = ""
+
     goToStats(driver, companyName)
 
     with open(str(companyName+"-"+fileName()), 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["Value", "Range", "Percentage", "Min", "Max"])
+        writer.writerow(
+            ["Value", "Range", "Percentage", "Min", "Max", "Advice"])
 
         # Repeats the getting stats values operations
         for x in range(repetitions):
@@ -129,18 +150,25 @@ def basicRoutine(driver, companyName, repetitions):
             tempRow.append(returnValue(driver, companyName))
             parcialRow = returnPercentage(driver, companyName)
             tempRow.append(parcialRow[0])
+
             if currentMin > float(parcialRow[0]):
                 currentMin = float(parcialRow[0])
             if currentMax < float(parcialRow[0]):
                 currentMax = float(parcialRow[0])
             tempRow.append(parcialRow[1])
+
             print("Current Min: " + str(currentMin))
             print("Current Max: " + str(currentMax))
+
             tempRow.append(currentMin)
             tempRow.append(currentMax)
-            #tempRow.append(returnGeneralView(driver, companyName))
-            writer.writerow(tempRow)
 
+            # tempRow.append(returnGeneralView(driver, companyName))
+            currentDifference, currentAdvice = advice(
+                currentMin, currentMax, parcialRow[0], currentDifference)
+
+            tempRow.append(currentAdvice)
+            writer.writerow(tempRow)
             print("-----------------------------")
 
 
@@ -149,6 +177,6 @@ driver = initializeChromWebDriver()
 # driver.get('https://www.etoro.com/markets/tsla/stats')
 # time.sleep(10)
 # invest(driver)
-#basicRoutine(driver, "tsla", 10000)
+# basicRoutine(driver, "tsla", 10000)
 
 basicRoutine(driver, "btc", 10000)
