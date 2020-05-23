@@ -3,6 +3,13 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import csv
+import datetime
+
+
+def fileName():
+    currentDT = datetime.datetime.now()
+    return(str(currentDT.month) + "-"+str(currentDT.day) + "-" +
+           str(currentDT.year)+"-"+str(currentDT.hour)+"_"+str(currentDT.minute)+"-min-max.csv")
 
 
 def dataAnalisis(fileName, categoria):
@@ -110,7 +117,7 @@ def basicRoutine(driver, companyName, repetitions):
     currentMax = -1000000
     goToStats(driver, companyName)
 
-    with open('lasthourtsl-min-max.csv', 'w', newline='') as file:
+    with open(str(companyName+"-"+fileName()), 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Value", "Range", "Percentage", "Min", "Max"])
 
@@ -142,6 +149,6 @@ driver = initializeChromWebDriver()
 # driver.get('https://www.etoro.com/markets/tsla/stats')
 # time.sleep(10)
 # invest(driver)
-basicRoutine(driver, "tsla", 10000)
+#basicRoutine(driver, "tsla", 10000)
 
-# basicRoutine(driver, "btc", 10000)
+basicRoutine(driver, "btc", 10000)
