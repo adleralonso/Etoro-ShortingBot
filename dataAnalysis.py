@@ -4,6 +4,7 @@ from selenium.webdriver.common.keys import Keys
 import time
 import csv
 import datetime
+import winsound
 
 
 def fileName():
@@ -109,30 +110,47 @@ def returnGeneralView(driver, companyName):
     return str(companyGeneralView.text)
 
 
+def sellSound():
+    frequency = 1500  # Set Frequency To 2500 Hertz
+    duration = 1000  # Set Duration To 1000 ms == 1 second
+    winsound.Beep(frequency, duration)
+
+
+def buySound():
+    frequency = 500  # Set Frequency To 2500 Hertz
+    duration = 500  # Set Duration To 1000 ms == 1 second
+    winsound.Beep(frequency, duration)
+    time.sleep(.5)
+    winsound.Beep(frequency, duration)
+
+
 def advice(currentMin, currentMax, currentValue, minDifference):
- # Sell Buy - Recomendation Based on MinMax difference of 20 or more
-    if float(currentMax) - minDifference > float(currentMin) and float(minDifference*.2) + float(currentMin) >= float(currentValue):
+    # Corrects minDifference Rule on 80/20 based on the difference between currentMax and currentMin
+    if minDifference < currentMax - currentMin:
+        minDifference = currentMax - currentMin
+    print("Min Difference: " + str(minDifference))
+
+    # Sell Buy - Recomendation Based on MinMax difference of 20 or more
+    if float(currentMax) - 4 > float(currentMin) and float(minDifference*.2) + float(currentMin) >= float(currentValue):
         advice = "You Should Buy"
-    elif float(currentMax) - minDifference > float(currentMin) and float(minDifference*.8) + (currentMin) <= float(currentValue):
+        buySound()
+    elif float(currentMax) - 4 > float(currentMin) and float(minDifference*.8) + (currentMin) <= float(currentValue):
         advice = "You should Sell"
+        sellSound()
     else:
         advice = "Wait champion"
 
-    # Corrects minDifference Rule on 80/20 based on the difference between currentMax and currentMin
-    if minDifference < currentMax - currentMin:
-        minDifference = currentMax - currentMax
     print(advice)
-
     return minDifference, advice
 
 
-def basicRoutine(driver, companyName, repetitions):
+def basicRoutine(driver, companyName, repetitions, currentDifference):
     # Initialize Driver and Company Name for current Routine
     driver = driver
     companyName = companyName
-    currentMin = 1000000
-    currentMax = -1000000
-    currentDifference = 20
+    currentMin = -34
+    currentMax = 2.5
+    currentDifference = currentDifference
     currentAdvice = ""
 
     goToStats(driver, companyName)
@@ -179,4 +197,4 @@ driver = initializeChromWebDriver()
 # invest(driver)
 # basicRoutine(driver, "tsla", 10000)
 
-basicRoutine(driver, "btc", 10000)
+basicRoutine(driver, "tsla", 10000, 3)
